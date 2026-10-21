@@ -1,11 +1,13 @@
 [gd_scene format=3 uid="uid://bwycu0qcxowwp"]
 
 [ext_resource type="Script" uid="uid://c7l36nqp8af5g" path="res://scenes/main.gd" id="1_0wfyh"]
+[ext_resource type="PackedScene" uid="uid://btuw83rmbnmpl" path="res://scenes/snake_segment.tscn" id="2_jyhfs"]
 [ext_resource type="Texture2D" uid="uid://bisqoofego05t" path="res://assets/bg.png" id="2_sugp2"]
 [ext_resource type="PackedScene" uid="uid://cpnph8v4rr7yn" path="res://scenes/hud.tscn" id="3_sugp2"]
 
 [node name="Main" type="Node" unique_id=280264094]
 script = ExtResource("1_0wfyh")
+snake_segment = ExtResource("2_jyhfs")
 
 [node name="Background" type="Sprite2D" parent="." unique_id=1768808179]
 position = Vector2(500, 550)
