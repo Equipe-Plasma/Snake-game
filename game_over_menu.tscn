@@ -1,0 +1,29 @@
+[gd_scene format=3 uid="uid://dwqsggnsu3bs0"]
+
+[ext_resource type="Script" uid="uid://muw67nq5mv6u" path="res://game_over_menu.gd" id="1_14ib6"]
+
+[node name="GameOverMenu" type="CanvasLayer" unique_id=1063291565]
+script = ExtResource("1_14ib6")
+
+[node name="GameOverPanel" type="Panel" parent="." unique_id=1234264928]
+modulate = Color(0.3137765, 1, 0.89451015, 1)
+offset_left = 295.0
+offset_top = 123.0
+offset_right = 726.0
+offset_bottom = 398.0
+
+[node name="ResultLabel" type="Label" parent="." unique_id=460944980]
+offset_left = 458.0
+offset_top = 180.0
+offset_right = 550.0
+offset_bottom = 203.0
+text = "GAME OVER"
+
+[node name="RestartButton" type="Button" parent="." unique_id=723391844]
+offset_left = 339.0
+offset_top = 240.0
+offset_right = 676.0
+offset_bottom = 359.0
+text = "PLAY AGAIN"
+
+[connection signal="pressed" from="RestartButton" to="." method="_on_restart_button_pressed"]
