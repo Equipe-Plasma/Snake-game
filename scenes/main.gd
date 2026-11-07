@@ -10,6 +10,10 @@ var game_started : bool = false
 var cells : int = 20
 var cell_size : int = 50
 
+#food variables
+var food_pos : Vector2
+var regen_food : bool = true
+
 #variaveis da cobra
 var old_data : Array
 var snake_data : Array
@@ -34,6 +38,7 @@ func new_game():
 	move_direction = up
 	can_move = true
 	generate_snake()
+	move_food()
 	
 func generate_snake():
 	old_data.clear()
@@ -50,5 +55,98 @@ func add_segment(pos):
 	snake.append(SnakeSegment)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func _process(delta):
+	move_snake()
+
+func move_snake():
+	if can_move:
+		
+		if Input.is_action_just_pressed("move_down") and move_direction != up:
+			move_direction = down
+			can_move = false
+			if not game_started:
+				start_game()
+
+		if Input.is_action_just_pressed("move_up") and move_direction != down:
+			move_direction = up
+			can_move = false
+			if not game_started:
+				start_game()
+
+		if Input.is_action_just_pressed("move_left") and move_direction != right:
+			move_direction = left
+			can_move = false
+			if not game_started:
+				start_game()
+
+		if Input.is_action_just_pressed("move_right") and move_direction != left:
+			move_direction = right
+			can_move = false
+			if not game_started:
+				start_game()
+
+func start_game():
+	game_started = true
+	$MoveTimer.start()
+
+func _on_move_timer_timeout():
+	#allow snake movement
+	can_move = true
+	#use the snake's previous position to move the segmentes
+	old_data = [] + snake_data
+	snake_data[0] += move_direction
+	for i in range(len(snake_data)):
+		#move all the segments along by one
+		if i > 0:
+			snake_data[i] = old_data[i - 1]
+		snake[i].position = (snake_data[i] * cell_size) + Vector2(0, cell_size)
+	check_out_of_bounds()
+	check_self_eaten()
+	check_food_eaten()
+	
+func check_out_of_bounds():
+	if snake_data[0].x < 0 or snake_data[0].x > cells or snake_data[0].y < 0 or snake_data[0].y >= cells - 1:
+		end_game()
+	
+func check_self_eaten():
+	for i in range(1, len(snake_data)):
+		if snake_data[0] == snake_data[i]:
+			end_game()
+
+func move_food():
+	while regen_food:
+		regen_food = false
+		
+		# Sorteia uma posição no grid. 
+		# Nota: o Y usa 'cells - 2' para respeitar o seu limite em check_out_of_bounds()
+		food_pos = Vector2(randi_range(0, cells - 1), randi_range(0, cells - 2))
+		
+		# Garante que a comida não dê respawn em cima do corpo da cobra
+		for i in snake_data:
+			if food_pos == i:
+				regen_food = true
+				
+	# Atualiza a posição visual da comida. 
+	# IMPORTANTE: Assumindo que você tenha um nó Sprite2D chamado "Food" na cena principal.
+	$Food.position = (food_pos * cell_size) + Vector2(0, cell_size)
+	
+	# Reseta a variável para a próxima vez que a função for chamada
+	regen_food = true
+
+func check_food_eaten():
+	# Se a coordenada da cabeça for igual a da comida
+	if snake_data[0] == food_pos:
+		# 1. Aumenta a pontuação e atualiza a HUD
+		score += 1
+		$Hud.get_node("ScoreLabel").text = "SCORE: " + str(score)
+		
+		# 2. Faz a cobra crescer adicionando um segmento na posição que a cauda estava no frame anterior
+		add_segment(old_data[-1])
+		
+		# 3. Move a comida para o próximo local
+		move_food()
+
+
+func end_game():
+	$MoveTimer.stop()
+	game_started = false
